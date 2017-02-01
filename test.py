@@ -4,22 +4,30 @@ import requests
 from bs4 import BeautifulSoup
 
 import pythonUrl as pU
-
+import os
+count = 0
 
 def write_news_to_file(url, subject):
-	file_name = 'archive_list-'+time.strftime("%S_%M_%H-%d_%m_%Y")+'.txt'
-	file_handler = open(file_name,'w',0)
-	file_handler.write(url,subject)	
+	buffer_string = url + ' : ' + subject + '\n'
+	#try:
+	file_handler.write(buffer_string)	
+	#except UnicodeEncodeError:
+#		pass
 
 def tinyUrl_of(index_string):
-	print(index_string)
 	page = requests.get(index_string)
 	soup = BeautifulSoup(page.content,'html.parser')
 	for line in soup.find_all('td'):
 		entry = line.find_all('a')
 		for news in entry:
-			#print pU.make_tiny('http://economictimes.indiatimes.com'+news.get('href')), news.contents[0]
-			write_news_to_file(pU.make_tiny('http://economictimes.indiatimes.com'+news.get('href')), news.contents[0])
+			if news.find_all('b'):
+				subject = '# find a way to get the month here'
+			else:
+		               subject = news.contents[0]
+
+			url = pU.make_tiny('http://economictimes.indiatimes.com'+news.get('href'))
+			#write_news_to_file(url,subject)
+			print url,subject
 			
 def process_index_string():
 	index_base_string = 'http://economictimes.indiatimes.com/archivelist/'
@@ -45,11 +53,40 @@ def process_index_string():
 				count_upper_limit = 28
 			
 			for i in range(1,count_upper_limit + 1):	
+				global count
 				month_string = month_base_string + str(month)
 				start_time_index_string = start_time_base_string + str(start_time_index)
 				index_string = index_base_string + year_string + ',' + month_string + ',' + start_time_index_string + addendum
 				tinyUrl_of(index_string)
+				count+= 1
 				start_time_index += 1
 
+
+def post_process(file_name):
+	post_process_string = 'sh post_process.sh ' + file_name  
+	os.system(post_process_string)	
+
+def html_conversion(file_name):
+	contents = open(file_name,'r')
+	with open('index.html','w') as html_file:
+		html_file.write('<table>\n')
+		for lines in contents.readlines():
+			html_file.write('<tr><td>%s</td></tr>\n' %lines.split())
+		
+		html_file.write('</table>\n')
+
+
+
 if __name__ == '__main__':
+	file_name = 'archive_list-'+time.strftime("%S_%M_%H-%d_%m_%Y")+'.txt'
+	file_handler = open(file_name,'w',0)
 	process_index_string()
+	file_handler.close()
+	print count
+#	post_process(file_name)
+#	html_conversion(file_name)
+
+		
+
+
+
