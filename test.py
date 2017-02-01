@@ -1,12 +1,15 @@
 
+import time
 import requests
 from bs4 import BeautifulSoup
 
 import pythonUrl as pU
 
 
-#def write_news_to_file(url, )
-
+def write_news_to_file(url, subject):
+	file_name = 'archive_list-'+time.strftime("%S_%M_%H-%d_%m_%Y")+'.txt'
+	file_handler = open(file_name,'w',0)
+	file_handler.write(url,subject)	
 
 def tinyUrl_of(index_string):
 	print(index_string)
@@ -15,9 +18,9 @@ def tinyUrl_of(index_string):
 	for line in soup.find_all('td'):
 		entry = line.find_all('a')
 		for news in entry:
-			print pU.make_tiny('http://economictimes.indiatimes.com'+news.get('href')), news.contents[0]
-
-
+			#print pU.make_tiny('http://economictimes.indiatimes.com'+news.get('href')), news.contents[0]
+			write_news_to_file(pU.make_tiny('http://economictimes.indiatimes.com'+news.get('href')), news.contents[0])
+			
 def process_index_string():
 	index_base_string = 'http://economictimes.indiatimes.com/archivelist/'
 	year_base_string = 'year-'
@@ -47,7 +50,6 @@ def process_index_string():
 				index_string = index_base_string + year_string + ',' + month_string + ',' + start_time_index_string + addendum
 				tinyUrl_of(index_string)
 				start_time_index += 1
-
 
 if __name__ == '__main__':
 	process_index_string()
