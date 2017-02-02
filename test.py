@@ -8,11 +8,15 @@ import os
 count = 0
 
 def write_news_to_file(url, subject):
-	buffer_string = url + ' : ' + subject + '\n'
-	#try:
-	file_handler.write(buffer_string)	
-	#except UnicodeEncodeError:
-#		pass
+	try:
+		buffer_string = url +' '+ subject + '\n'
+		file_handler.write(buffer_string)	
+	except UnicodeEncodeError:
+		print url,subject
+		#modified_string = subject.replace('\u','')
+		#buffer_string = url + ' : ' + modified_string + '\n'
+		#file_handler.write(buffer_string)	
+		pass
 
 def tinyUrl_of(index_string):
 	page = requests.get(index_string)
@@ -26,8 +30,8 @@ def tinyUrl_of(index_string):
 		               subject = news.contents[0]
 
 			url = pU.make_tiny('http://economictimes.indiatimes.com'+news.get('href'))
-			#write_news_to_file(url,subject)
-			print url,subject
+			write_news_to_file(url,subject)
+			#print url,subject
 			
 def process_index_string():
 	index_base_string = 'http://economictimes.indiatimes.com/archivelist/'
