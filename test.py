@@ -4,8 +4,12 @@ import requests
 from bs4 import BeautifulSoup
 
 import pythonUrl as pU
+import web2txt as wt
+
 import os
 count = 0
+
+
 
 def write_news_to_file(url, subject):
 	try:
@@ -29,8 +33,14 @@ def tinyUrl_of(index_string):
 			else:
 		               subject = news.contents[0]
 
-			url = pU.make_tiny('http://economictimes.indiatimes.com'+news.get('href'))
-			write_news_to_file(url,subject)
+			url = 'http://economictimes.indiatimes.com'+news.get('href')
+			wt.print_news(url)
+			print("\n")
+			print("\n")
+			print("\n")
+			print("\n")
+			#url = pU.make_tiny('http://economictimes.indiatimes.com'+news.get('href'))
+			#write_news_to_file(url,subject)
 			#print url,subject
 			
 def process_index_string():
