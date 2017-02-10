@@ -7,8 +7,6 @@ import pythonUrl as pU
 import web2txt as wt
 
 import os
-count = 0
-
 
 
 def write_news_to_file(url, subject):
@@ -31,14 +29,13 @@ def tinyUrl_of(index_string):
 			if news.find_all('b'):
 				subject = '# find a way to get the month here'
 			else:
-		               subject = news.contents[0]
+		    subject = news.contents[0]
 
 			url = 'http://economictimes.indiatimes.com'+news.get('href')
+			print(subject)
 			wt.print_news(url)
 			print("\n")
-			print("\n")
-			print("\n")
-			print("\n")
+			print("-----------------------------------------------------------------")
 			#url = pU.make_tiny('http://economictimes.indiatimes.com'+news.get('href'))
 			#write_news_to_file(url,subject)
 			#print url,subject
