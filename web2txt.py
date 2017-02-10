@@ -4,6 +4,7 @@ import sys
 import re
 import requests
 import requests_cache
+import sqlite3
 from bs4 import BeautifulSoup
 
 import process_url
@@ -36,16 +37,15 @@ def get_news_urls(index_string):
     for line in soup.find_all('td'):
       entry = line.find_all('a')
       for news in entry:
+        if '/news/politics-and-nation/' not in str(news.get('href')):
+           continue
         if news.find_all('b'):
             subject = '# find a way to get the month here'
         else:
             subject = news.contents[0]
         url = 'http://economictimes.indiatimes.com' + news.get('href')
         content = get_news(url)
-        database.append([subject,content])
-        if(len(database) == 5):
-            print(database[3:5]) #
-            sys.exit()
+        database.append([url,subject,content])
 
 
 def get_and_process_index_string_for_news_urls():
@@ -56,7 +56,7 @@ def get_and_process_index_string_for_news_urls():
 
 def start():
     get_and_process_index_string_for_news_urls()
-    print_news()
+    print(len(database))
 
 
 if __name__ == '__main__':
