@@ -4,21 +4,14 @@ import sys
 import re
 import requests
 import requests_cache
-import sqlite3
 from bs4 import BeautifulSoup
 
+import sqlite3
 import process_url
-
-database_name = 'news.db'
-connection = sqlite3.connect(database_name)
-cursor = connection.cursor()
-cursor.execute('''CREATE TABLE news (subject text, article text)''') #initialize database
-
 
 def striphtml(data):
     p = re.compile(r'<.*?>')
     return p.sub('', data)
-
 
 def get_news_div_tag(url):
     requests_cache.install_cache()
@@ -34,8 +27,7 @@ def get_news(url):
     return news
 
 def get_news_and_store_in_database(index_string):
-    #global connection
-    #global cursor
+    database = []
     count = 1
     requests_cache.install_cache()
     page = requests.get(index_string)
@@ -49,20 +41,28 @@ def get_news_and_store_in_database(index_string):
             subject = news.contents[0]
         url = 'http://economictimes.indiatimes.com' + news.get('href')
         content = get_news(url)
-        count += 1
-        print(subject,content)
-        cursor.execute("INSERT INTO news VALUES (?,?)", (subject,content))
-        connection.commit()
-        if count > 5:
-           connection.close()
-            
+        print "URL #" + str(count) + ": " + url
+        database.append([subject,content])
+    print("Started writing into data base. Check your database file size!")
+    store(database[4:])
+    print("Finished writng into database.")
+        
 
 def get_and_process_index_string_for_news_urls():
     index_string_list = process_url.process_index_string()
     for index_string in index_string_list:
         get_news_and_store_in_database(index_string)
 
+connection = sqlite3.connect('sample.db')
+cursor = connection.cursor()
+cursor.execute('''CREATE TABLE news (subject text, article text)''')
 
+def store(database):
+    for entry in database:
+        cursor.execute("INSERT INTO news VALUES (?,?)", (entry[0],entry[1]))
+        connection.commit()
+    connection.close()
+        
 def start():
     get_and_process_index_string_for_news_urls()
        
