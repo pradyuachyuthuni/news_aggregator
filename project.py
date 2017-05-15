@@ -83,7 +83,7 @@ def process_news_object(news_obj_q):
    pass
   
   content = soup.article.select('.section1')[0].get_text()
-  data = cms_ref+':'+ author +'|'+title+'|'+img_path+'|'+content
+  data = cms_ref+'|'+ author +'|'+title+'|'+img_path+'|'+content
   logging.info(data)
   
   news_obj_q.task_done()
