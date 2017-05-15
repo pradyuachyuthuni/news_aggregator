@@ -1,7 +1,6 @@
 import Queue
 from bs4 import BeautifulSoup
 import requests
-import requests_cache
 import threading
 import time
 from StringIO import StringIO
@@ -9,7 +8,6 @@ from PIL import Image
 import logging
 from datetime import date
 
-requests_cache.install_cache('demo_cache')
 news_url_queue = Queue.Queue(maxsize=-1)
 news_objects_queue = Queue.Queue(maxsize=-1)
 news_url_lagged_queue = Queue.Queue(maxsize=-1)
@@ -23,7 +21,7 @@ date_url_archives = []
 def get_date_url_archives():
   base_date = date(1899,12,30)
   year = 2017
-  for month in [4]:
+  for month in [3,4]:
     if month in [1,3,5,7,8,10,12]:
      days = 31
     elif month in [4,6,9,11]:
@@ -85,7 +83,7 @@ def process_news_object(news_obj_q):
    pass
   
   content = soup.article.select('.section1')[0].get_text()
-  data = cms_ref+';'+ author +';'+title+';'+img_path+';'+content
+  data = cms_ref+'|'+ author +'|'+title+'|'+img_path+'|'+content
   logging.info(data)
   
   news_obj_q.task_done()
