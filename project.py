@@ -118,10 +118,6 @@ for i in range(1):
  worker2.setDaemon(True)
  worker2.start()
 
-#base_string = 'http://economictimes.indiatimes.com/archivelist/year-2017,month-3,starttime-42'
-#addendum = '.cms'
-#urls = [base_string + str(i) + addendum for i in range(736,856)]
-
 get_date_url_archives()
 print date_url_archives
 map(acquire_news_urls,date_url_archives)
