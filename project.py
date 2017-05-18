@@ -15,13 +15,15 @@ lagged_objects_queue = Queue.Queue(maxsize=-1)
 
 logging.basicConfig(filename="logger.log",filemode='w',datefmt='%M:%S',level=logging.INFO)
 lagged_entries = []
-
 date_url_archives = []
+
+
 
 def get_date_url_archives():
   base_date = date(1899,12,30)
-  year = 2017
-  for month in [3,4]:
+  year = 2013
+  #for month in [1,2,3,4,5,6,7,8,9,10,11,12]:
+  for month in [9,10,11,12]:
     if month in [1,3,5,7,8,10,12]:
      days = 31
     elif month in [4,6,9,11]:
@@ -30,15 +32,15 @@ def get_date_url_archives():
      days = 28
     for day in range(1,days+1):
      cd = date(year,month,day)
-     cms_number = (cd - base_date).days
-     date_url = 'http://economictimes.indiatimes.com/archivelist/year-2017,month-{},starttime-{}.cms'.format(month,cms_number)
+     start_time_number = (cd - base_date).days
+     date_url = 'http://economictimes.indiatimes.com/archivelist/year-{},month-{},starttime-{}.cms'.format(year,month,start_time_number)
      date_url_archives.append(date_url)
 
 def acquire_news_urls(url):
  archives_page = requests.get(url)
  soup = BeautifulSoup(archives_page.content,'html.parser')
- content_boxes = soup.body.select('.contentbox5')
- soup2 = BeautifulSoup(str(content_boxes[1])+str(content_boxes[1]),'html.parser')
+ content_boxes = soup.body.select('.contentbox5')[1:3]
+ soup2 = BeautifulSoup(''.join([str(x) for x in content_boxes]), 'html.parser')
  news_links = soup2.find_all('a')
  for link in news_links:
    href = link.get('href')
@@ -61,7 +63,7 @@ def process_news_object(news_obj_q):
   title = soup.title.get_text()
   
   try:
-   cms_ref = str(soup.article.select('.cmtLinks')[0].a['href'])
+   news_href = str(soup.article.select('.cmtLinks')[0].a['href'])
   except (IndexError,AttributeError) as e:
    pass
   
@@ -73,18 +75,23 @@ def process_news_object(news_obj_q):
   finally:
    author = str(by.text)
    if 'By' not in author:
-    lagged_entries.append(cms_ref)
+    lagged_entries.append(news_href)
    
   try:
    img_path = soup.article.select('.articleImg')[0].img['src']
   except (TypeError,IndexError,AttributeError) as e:
    pass #get the default image from the database. default image for no image obtained from the news webpage
   finally:
+   img_path = 'None'
    pass
   
-  content = soup.article.select('.section1')[0].get_text()
-  data = cms_ref+'|'+ author +'|'+title+'|'+img_path+'|'+content
-  logging.info(data)
+  try:
+   content = soup.article.select('.section1')[0].get_text()
+  except (TypeError,IndexError,AttributeError) as e:
+   pass #get the default image from the database. default image for no image obtained from the news webpage
+  finally:
+   data = title + '|' + news_href + '|' + author + '|' + img_path +  '|' + content
+   logging.info(data)
   
   news_obj_q.task_done()
 
@@ -116,6 +123,7 @@ for i in range(1):
 #urls = [base_string + str(i) + addendum for i in range(736,856)]
 
 get_date_url_archives()
+print date_url_archives
 map(acquire_news_urls,date_url_archives)
 
 news_url_queue.join()
