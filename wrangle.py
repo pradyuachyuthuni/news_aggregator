@@ -42,19 +42,18 @@ def instantiate_news_objects(news_list):
      object_internal_separator = '|'
      obj_contents_list = news_item.split(object_internal_separator)
      length = len(obj_contents_list)
-     #if length == 5:
-     #  regex = r"""[a-zA-Z]+ [0-3][0-9], \d+, [0-9][0-9].[0-9][0-9] [A|P]M IST"""
-     #  if re.match(regex,obj_contents_list[1]):
-     #    article_link,date_and_time,title,image_path,content = obj_contents_list
-     #    author = None
-     if length is not 6:
-       for x in obj_contents_list[4:6]:
-        print x
-       time.sleep(5)
-       print "_--------------------------------------------------------------_"
-       #article_link,author,date_and_time,title,image_path,content = obj_contents_list
-     #news_object = NewsObject(title,author,date_and_time,article_link,image_path,content)
-     #news_object.print_news_capsule()
+       if length is 5:
+        title,article_link,date_and_time,image_path,content = obj_contents_list
+        author = "Inhouse"
+       elif length is 6:
+        title,article_link,author,date_and_time,image_path,content = obj_contents_list
+       elif length > 6:
+        title,article_link,author,date_and_time,image_path = obj_contents_list[0:5]
+        content = obj_contents_list[5:]
+       else:
+        print "improper news object found"
+     news_object = NewsObject(title,author,date_and_time,article_link,image_path,content)
+     news_object.print_news_capsule()
 
 if __name__ == '__main__':
     raw_data_file = create_raw_data_file()
