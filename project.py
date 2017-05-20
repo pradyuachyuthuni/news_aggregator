@@ -22,8 +22,7 @@ date_url_archives = []
 def get_date_url_archives():
   base_date = date(1899,12,30)
   year = 2013
-  #for month in [1,2,3,4,5,6,7,8,9,10,11,12]:
-  for month in [9,10,11,12]:
+  for month in [1,2,3,4,5,6,7,8,9,10,11,12]:
     if month in [1,3,5,7,8,10,12]:
      days = 31
     elif month in [4,6,9,11]:
@@ -81,17 +80,14 @@ def process_news_object(news_obj_q):
    img_path = soup.article.select('.articleImg')[0].img['src']
   except (TypeError,IndexError,AttributeError) as e:
    pass #get the default image from the database. default image for no image obtained from the news webpage
-  finally:
-   img_path = 'None'
-   pass
   
   try:
    content = soup.article.select('.section1')[0].get_text()
   except (TypeError,IndexError,AttributeError) as e:
    pass #get the default image from the database. default image for no image obtained from the news webpage
-  finally:
-   data = title + '|' + news_href + '|' + author + '|' + img_path +  '|' + content
-   logging.info(data)
+   
+  data = title + '|' + news_href + '|' + author + '|' + img_path +  '|' + content
+  logging.info(data)
   
   news_obj_q.task_done()
 
