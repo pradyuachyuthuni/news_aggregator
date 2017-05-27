@@ -1,5 +1,5 @@
 import os
-import time
+import sys
 from django.utils.html import strip_tags
 
 class NewsObject:
@@ -15,11 +15,10 @@ class NewsObject:
     fd.write(strip_tags(str(self.__dict__)))
     fd.write('\n')
 
-def create_raw_data_file():
-    input_file = 'april.log'
-    input_file_copy = 'copy_' + input_file
+def create_raw_data_file(log_file):
+    input_file_copy = 'copy_' + log_file
     raw_data_file = 'test.log'
-    os.system('cp {} {}'.format(input_file,input_file_copy))
+    os.system('cp {} {}'.format(log_file,input_file_copy))
     os.system("tr -d '\n' < {} > {}".format(input_file_copy,raw_data_file))
     return raw_data_file
 
@@ -51,8 +50,13 @@ def instantiate_news_objects(news_list):
      news_object.write_news_capsule_to_file()
 
 if __name__ == '__main__':
-    fd = open('news_database.txt','w',0)
-    raw_data_file = create_raw_data_file()
-    news_list = cleanup_unwanted_data(raw_data_file)
-    instantiate_news_objects(news_list)
+   args = sys.argv
+   if len(args) == 1:
+     sys.exit()
+   else:
+     log_file = str(args[1]) 
+     fd = open('{}_news_database.txt'.format(log_file.split('.')[0]),'w',0)
+     raw_data_file = create_raw_data_file(log_file)
+     news_list = cleanup_unwanted_data(raw_data_file)
+     instantiate_news_objects(news_list)
     
